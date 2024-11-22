@@ -1,0 +1,65 @@
+@font-face {
+    src: url("./fonts/sugarmagicpersonaluseonly-jemyo.otf");
+    font-family: sugarMagic;
+}
+
+body{
+    margin:0px;
+    background-color: #F0EBD8;
+}
+
+.hero-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20vh;
+}
+
+.hero{
+    font-family: sugarMagic;
+    border-radius: 4%;  
+    font-size: 5vw;
+    color: #F1F1F1;
+    text-align: center;
+}
+.trim{
+    display: inline-block;
+    background-color: #1D2D44;
+    width:clamp(10vw, 12vw, 14vw);
+    border-radius: 1vw 0px 0px 1vw;
+    box-shadow: 5px 7px #0d1321;
+}
+.doc{
+    display:inline-block;
+    background-color: #3E5C76;
+    width:clamp(8vw, 10vw, 12vw);
+    border-radius: 0px 1vw 1vw 0px;
+    box-shadow: 5px 7px #0d1321;
+}
+.button-wrapper{
+    display: flex;
+    justify-content: center;
+    margin-top: 4vh;
+}
+#compress{
+    font-family: sugarMagic;
+    height: clamp(4vh, 6vh, 12vh);
+    background-color: #1D2D44;
+    width: clamp(10vw, 12vw, 14vw);
+    color: #F1F1F1;
+    font-size: 2vw;
+    margin-right: 2vw;
+    border-radius: 1vw;
+    box-shadow: 3px 5px #0d1321;
+}
+#split{
+    height: 6vh;
+    font-size: 2vw;
+    background-color: #3E5C76;
+    height: clamp(4vh, 6vh, 12vh);
+    width: clamp(10vw, 12vw, 14vw);
+    color: #F1F1F1;
+    font-family: sugarMagic;
+    border-radius: 1vw;
+    box-shadow: 3px 5px #0d1321;
+}
