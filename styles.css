@@ -21,6 +21,10 @@ body{
     font-size: 5vw;
     color: #F1F1F1;
     text-align: center;
+    transition: ease-in-out 0.5s;
+}
+.hero:hover{
+    transform: scale(1.1);
 }
 .trim{
     display: inline-block;
@@ -35,6 +39,9 @@ body{
     width:clamp(8vw, 10vw, 12vw);
     border-radius: 0px 1vw 1vw 0px;
     box-shadow: 5px 7px #0d1321;
+}
+input[type="file"]{ /*Hiding the input tag and then triggering the input when the button is clicked using js*/
+    display: none;
 }
 .button-wrapper{
     display: flex;
@@ -51,6 +58,12 @@ body{
     margin-right: 2vw;
     border-radius: 1vw;
     box-shadow: 3px 5px #0d1321;
+    transition: ease-in-out 0.5s;
+}
+#compress:hover{
+    transform:scale(1.1);
+    background-color: #f4eac6;
+    color: #1D2D44;
 }
 #split{
     height: 6vh;
@@ -62,4 +75,10 @@ body{
     font-family: sugarMagic;
     border-radius: 1vw;
     box-shadow: 3px 5px #0d1321;
+    transition: ease-in-out 0.5s;
+}
+#split:hover{
+    transform:scale(1.1);
+    background-color: #f4eac6;
+    color: #1D2D44;
 }
