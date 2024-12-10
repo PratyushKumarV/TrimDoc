@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "version": "1.0",
+    "name": "TrimDoc",
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": "./images/trim.png"
+    },
+    "content_security_policy":{
+        "extension_pages": "script-src 'self' https://unpkg.com; object-src 'self'"
+    }
+}

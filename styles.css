@@ -25,6 +25,7 @@ body{
 }
 .hero:hover{
     transform: scale(1.1);
+    cursor:auto
 }
 .trim{
     display: inline-block;
@@ -62,8 +63,9 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
 }
 #compress:hover{
     transform:scale(1.1);
-    background-color: #f4eac6;
+    background-color: #f3e6b8;
     color: #1D2D44;
+    cursor:grab
 }
 #split{
     height: 6vh;
@@ -81,4 +83,5 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
     transform:scale(1.1);
     background-color: #f4eac6;
     color: #1D2D44;
+    cursor:grab
 }
