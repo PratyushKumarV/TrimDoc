@@ -5,98 +5,82 @@ const splitInput=document.querySelector("#split-input")
 
 const PUBLIC_KEY='project_public_a07c1ecdfedc60c0c2526a6683da46a2_qbUwZ9aefe20d9b8785be481d001c3aa97a10'
 const SECRET_KEY='secret_key_2512854c848aa25009ebf990b3608df8_GXNZu2c38c7bb9742847df64f32491ad72b4c'
-const token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuaWxvdmVwZGYuY29tIiwiYXVkIjoiIiwiaWF0IjoxNzM4NjA0NDQwLCJuYmYiOjE3Mzg2MDQ0NDAsImV4cCI6MTczODYwODA0MCwianRpIjoicHJvamVjdF9wdWJsaWNfYTA3YzFlY2RmZWRjNjBjMGMyNTI2YTY2ODNkYTQ2YTJfcWJVd1o5YWVmZTIwZDliODc4NWJlNDgxZDAwMWMzYWE5N2ExMCJ9.HGoE2Kx743fC2xEVP-LhgOaWt7i3IIe6capb1at4gVE'
+const token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuaWxvdmVwZGYuY29tIiwiYXVkIjoiIiwiaWF0IjoxNzM4NjU5MTM0LCJuYmYiOjE3Mzg2NTkxMzQsImV4cCI6MTczODY2MjczNCwianRpIjoicHJvamVjdF9wdWJsaWNfYTA3YzFlY2RmZWRjNjBjMGMyNTI2YTY2ODNkYTQ2YTJfcWJVd1o5YWVmZTIwZDliODc4NWJlNDgxZDAwMWMzYWE5N2ExMCJ9.hgYA76x94sTHID3YAyQmePHmcnpCm7RbZxhQE6UUkZ0'
 
 compressbtn.addEventListener("click", ()=>{
     compressInput.click() //simulates a button click for the input element when the compress button is clicked
 })
 
+//compress functionality
 compressInput.addEventListener("change", async(event)=>{
     try{
         const file=event.target.files[0]
-
         console.log(file.name)
 
-        const {server:uploadServer, task:taskId}=await startServer("https://api.ilovepdf.com/v1/start/compress", {
+        // starting the server returns the task id and the server we are supposed to upload the file to
+        const {server:uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/compress", {
             method:"GET",
             headers:{
                 "Content-type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
         })
-
         console.log(uploadServer)
         console.log(taskId)
 
+        // For uploading the file from the local system we have to use a FormData object
         const formDataUpload=new FormData() // FormData should be used for uploading the files
         formDataUpload.append("task", taskId)
         formDataUpload.append("file", file)
-
-        const {server_filename}=await uploadFile(`https://${uploadServer}/v1/upload`, {
+        const {server_filename}=await sendRequest(`https://${uploadServer}/v1/upload`, {
             method:"POST",
             headers:{
                 "Authorization": `Bearer ${token}`
             },
             body:formDataUpload
         })
-
         console.log(server_filename)
 
-        const processRequestData=new FormData()
-        processRequestData.append("task", taskId)
-        processRequestData.append("tool", "compress")
-        processRequestData.append("files", [
-            {
-                "server_filename":server_filename, 
-                "filename":`${file.name}_compressed.pdf`
-            }
-        ])
-
-
-        await uploadFile(`https://${uploadServer}/v1/process`, {
+        // For proccessing the uploaded file we have to upload a JSON object
+        const processRequestData={
+            task:taskId,
+            tool:"compress",
+            files:[
+                {
+                    server_filename: server_filename,
+                    filename: `${file.name.slice(0, file.name.length-4)}_compressed.pdf`
+                }
+            ]
+        }
+        const processStatus=await sendRequest(`https://${uploadServer}/v1/process`, {
             method:"POST",
             headers:{
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${token}`,
+                "Content-Type":"application/json"
             },
-            body:processRequestData
+            body:JSON.stringify(processRequestData)
         })
-
+        console.log(processStatus)
         
+        // Sending a GET request for downloading. The response is an object with a parameter called the body which contains the readable stream of the compressed PDF.
+        const downloadResponse=await fetch(`https://${uploadServer}/v1/download/${taskId}`, {            
+            method:"GET",
+            headers:{
+                "Authorization": `Bearer ${token}`,
+            }
+        })
+        const readableStream=downloadResponse.body
+
+        // To download the file we have to convert the readable stream into a blob
+        const blob=await streamToBlob(readableStream)
+        downloadFile(blob, `${file.name.slice(0, file.name.length-4)}_compressed.pdf`)
         
     }catch(err){
         console.log(err)
     }
 })
 
-async function startServer(url, options){
-    const request=new Request(url, options)
-    const response=await fetch(request)
-    const data=await response.json() // The response will contain the server where the file is to be uploaded and the task id
-    return data
-}
-
-async function uploadFile(url, options){
-    const request=new Request(url, options)
-    const response=await fetch(request)
-    const data=await response.json()
-    return data
-}
-
-async function process(url, options){
-    const request=new Request(url, options)
-    const response=await fetch(request)
-    const data=await response.json()
-    console.log(data)
-}
-
-function downloadFile(compressed, compressedFilename){
-    const obj=new Blob([compressed]) // contruct a blob with the compressed ArrayBuffer. Remember the parameter should be a list
-    const link=document.createElement('a') 
-    link.href=URL.createObjectURL(obj) // The href attribute is set to a URL which is created using the static method createObjectURL
-    link.download=compressedFilename
-    link.click()
-}
-
+// split functionality
 splitbtn.addEventListener("click", ()=>{
     splitInput.click()
 })
@@ -104,3 +88,36 @@ splitbtn.addEventListener("click", ()=>{
 splitInput.addEventListener("change", ()=>{
     
 })
+
+// Essential functions
+async function sendRequest(url, options){
+    const request=new Request(url, options)
+    const response=await fetch(request)
+    const data=await response.json()
+    return data
+}
+
+async function streamToBlob(readableStream){ // Converts a readable stream into a blob for downloading
+    const reader=readableStream.getReader()
+    const chunks=[]
+    
+    let done=false
+
+    while(!done){
+        const {value, done:isDone}=await reader.read()
+        if(value){
+            chunks.push(value)
+        }
+        done=isDone
+    }
+
+    return new Blob(chunks, {type: "application/pdf"})
+}
+
+async function downloadFile(blob, filename){
+    const link=document.createElement('a') 
+    const downloadURL=URL.createObjectURL(blob)
+    link.href=downloadURL
+    link.download=filename
+    link.click()
+}
