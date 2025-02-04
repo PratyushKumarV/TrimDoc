@@ -5,7 +5,15 @@ const splitInput=document.querySelector("#split-input")
 
 const PUBLIC_KEY='project_public_a07c1ecdfedc60c0c2526a6683da46a2_qbUwZ9aefe20d9b8785be481d001c3aa97a10'
 const SECRET_KEY='secret_key_2512854c848aa25009ebf990b3608df8_GXNZu2c38c7bb9742847df64f32491ad72b4c'
-const token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuaWxvdmVwZGYuY29tIiwiYXVkIjoiIiwiaWF0IjoxNzM4NjU5MTM0LCJuYmYiOjE3Mzg2NTkxMzQsImV4cCI6MTczODY2MjczNCwianRpIjoicHJvamVjdF9wdWJsaWNfYTA3YzFlY2RmZWRjNjBjMGMyNTI2YTY2ODNkYTQ2YTJfcWJVd1o5YWVmZTIwZDliODc4NWJlNDgxZDAwMWMzYWE5N2ExMCJ9.hgYA76x94sTHID3YAyQmePHmcnpCm7RbZxhQE6UUkZ0'
+const token=await getToken()
+
+function showLoader(){
+    document.querySelector(".loader").classList.remove("hidden") // removes the hidden class in the selected element
+}
+
+function hideLoader(){
+    document.querySelector(".loader").classList.add("hidden")
+}
 
 compressbtn.addEventListener("click", ()=>{
     compressInput.click() //simulates a button click for the input element when the compress button is clicked
@@ -14,6 +22,7 @@ compressbtn.addEventListener("click", ()=>{
 //compress functionality
 compressInput.addEventListener("change", async(event)=>{
     try{
+        showLoader()
         const file=event.target.files[0]
         console.log(file.name)
 
@@ -73,8 +82,8 @@ compressInput.addEventListener("change", async(event)=>{
 
         // To download the file we have to convert the readable stream into a blob
         const blob=await streamToBlob(readableStream)
-        downloadFile(blob, `${file.name.slice(0, file.name.length-4)}_compressed.pdf`)
-        
+        hideLoader()
+        downloadFile(blob, processStatus.download_filename)
     }catch(err){
         console.log(err)
     }
@@ -90,10 +99,38 @@ splitInput.addEventListener("change", ()=>{
 })
 
 // Essential functions
+async function getToken(){
+    const token=sessionStorage.getItem("token")
+    if(token){
+        return token
+    }
+    try{
+        const {token:newToken} = await sendRequest("https://api.ilovepdf.com/v1/auth",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(
+                {
+                    public_key:PUBLIC_KEY
+                }
+            )
+        })
+        sessionStorage.setItem("token",newToken)
+        return newToken
+    }catch(error){
+        console.log(error)
+    }
+}
+
 async function sendRequest(url, options){
     const request=new Request(url, options)
     const response=await fetch(request)
     const data=await response.json()
+    if(!response.ok){
+        const errorText=await response.text()
+        console.log(errorText)
+    }
     return data
 }
 
