@@ -23,67 +23,69 @@ compressbtn.addEventListener("click", ()=>{
 compressInput.addEventListener("change", async(event)=>{
     try{
         showLoader()
-        const file=event.target.files[0]
-        console.log(file.name)
+        const file=Array.from(event.target.files)
+        const downloadableBlob=[]
 
-        // starting the server returns the task id and the server we are supposed to upload the file to
-        const {server:uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/compress", {
-            method:"GET",
-            headers:{
-                "Content-type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-        })
-        console.log(uploadServer)
-        console.log(taskId)
+        // The map function is applied to an array and it accepts a callback whose argument is each element in the array
+        Promise.all(file.map(async function(file){
+            // starting the server returns the task id and the server we are supposed to upload the file to
+            const {server:uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/compress", {
+                method:"GET",
+                headers:{
+                    "Content-type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+            })
 
-        // For uploading the file from the local system we have to use a FormData object
-        const formDataUpload=new FormData() // FormData should be used for uploading the files
-        formDataUpload.append("task", taskId)
-        formDataUpload.append("file", file)
-        const {server_filename}=await sendRequest(`https://${uploadServer}/v1/upload`, {
-            method:"POST",
-            headers:{
-                "Authorization": `Bearer ${token}`
-            },
-            body:formDataUpload
-        })
-        console.log(server_filename)
+            // For uploading the file from the local system we have to use a FormData object
+            const formDataUpload=new FormData() // FormData should be used for uploading the files
+            formDataUpload.append("task", taskId)
+            formDataUpload.append("file", file)
+            const {server_filename}=await sendRequest(`https://${uploadServer}/v1/upload`, {
+                method:"POST",
+                headers:{
+                    "Authorization": `Bearer ${token}`
+                },
+                body:formDataUpload
+            })
 
-        // For proccessing the uploaded file we have to upload a JSON object
-        const processRequestData={
-            task:taskId,
-            tool:"compress",
-            files:[
-                {
-                    server_filename: server_filename,
-                    filename: `${file.name.slice(0, file.name.length-4)}_compressed.pdf`
-                }
-            ]
-        }
-        const processStatus=await sendRequest(`https://${uploadServer}/v1/process`, {
-            method:"POST",
-            headers:{
-                "Authorization": `Bearer ${token}`,
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(processRequestData)
-        })
-        console.log(processStatus)
-        
-        // Sending a GET request for downloading. The response is an object with a parameter called the body which contains the readable stream of the compressed PDF.
-        const downloadResponse=await fetch(`https://${uploadServer}/v1/download/${taskId}`, {            
-            method:"GET",
-            headers:{
-                "Authorization": `Bearer ${token}`,
+            // For proccessing the uploaded file we have to upload a JSON object
+            const processRequestData={
+                task:taskId,
+                tool:"compress",
+                files:[
+                    {
+                        server_filename: server_filename,
+                        filename: `${file.name.slice(0, file.name.length-4)}_compressed.pdf`
+                    }
+                ]
             }
-        })
-        const readableStream=downloadResponse.body
+            const processStatus=await sendRequest(`https://${uploadServer}/v1/process`, {
+                method:"POST",
+                headers:{
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(processRequestData)
+            })
+            
+            // Sending a GET request for downloading. The response is an object with a parameter called the body which contains the readable stream of the compressed PDF.
+            const downloadResponse=await fetch(`https://${uploadServer}/v1/download/${taskId}`, {            
+                method:"GET",
+                headers:{
+                    "Authorization": `Bearer ${token}`,
+                }
+            })
+            const readableStream=downloadResponse.body
 
-        // To download the file we have to convert the readable stream into a blob
-        const blob=await streamToBlob(readableStream)
-        hideLoader()
-        downloadFile(blob, processStatus.download_filename)
+            // To download the file we have to convert the readable stream into a blob
+            downloadableBlob.push([await streamToBlob(readableStream), processStatus.download_filename]) // storing the results in this format because for downloading we need the blob and the filename
+        })).then(()=>{
+            hideLoader()
+            downloadableBlob.forEach(([blob, filename])=>{
+                downloadFile(blob, filename)
+            })
+        })
     }catch(err){
         console.log(err)
     }
