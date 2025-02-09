@@ -3,16 +3,26 @@ const compressInput=document.querySelector("#compress-input")
 const splitbtn=document.querySelector("#split")
 const splitInput=document.querySelector("#split-input")
 
+// These keys have to be properly handled before deployment
 const PUBLIC_KEY='project_public_a07c1ecdfedc60c0c2526a6683da46a2_qbUwZ9aefe20d9b8785be481d001c3aa97a10'
 const SECRET_KEY='secret_key_2512854c848aa25009ebf990b3608df8_GXNZu2c38c7bb9742847df64f32491ad72b4c'
 const token=await getToken()
 
+// UI elements toggle
 function showLoader(){
     document.querySelector(".loader").classList.remove("hidden") // removes the hidden class in the selected element
 }
 
 function hideLoader(){
-    document.querySelector(".loader").classList.add("hidden")
+    document.querySelector(".loader").classList.add("hidden") // adds the hidden class in the selected element
+}
+
+function showSplit(){
+    document.querySelector(".split-dialog").classList.remove("hidden")
+}
+
+function hideSplit(){
+    document.querySelector(".split-dialog").classList.add("hidden")
 }
 
 compressbtn.addEventListener("click", ()=>{
@@ -84,6 +94,7 @@ compressInput.addEventListener("change", async(event)=>{
             hideLoader()
             downloadableBlob.forEach(([blob, filename])=>{
                 downloadFile(blob, filename)
+                console.log(`Donwloaded file ${filename}`)
             })
         })
     }catch(err){
@@ -96,8 +107,13 @@ splitbtn.addEventListener("click", ()=>{
     splitInput.click()
 })
 
-splitInput.addEventListener("change", ()=>{
-    
+splitInput.addEventListener("change", async(event)=>{
+    try{
+        showSplit()
+        const file=event.target.files[0]
+    }catch(err){
+        console.log(err)
+    }
 })
 
 // Essential functions
