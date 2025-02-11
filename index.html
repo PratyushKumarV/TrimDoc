@@ -12,17 +12,19 @@
     </div>
     <div class="split-dialog hidden">
         <div class="dialog">
-            <form>
-                <h1>Split PDF</h1>
-                <label>From</label>
-                <input>
-                <label>To</label>
-                <input>
-                <div class="btn-wrapper">
-                    <button class="btn">Submit</button>
-                    <button class="btn">Cancel</button>
+            <div>
+                <div>
+                    <h1 class="split-heading">Split PDF</h1>
                 </div>
-            </form>
+                <label>From</label>
+                <input id="from" required>
+                <label>To</label>
+                <input id="to" required>
+                <div class="btn-wrapper">
+                    <button class="btn" id="submit-btn">Submit</button>
+                    <button class="btn" id="cancel-btn">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="hero-wrapper">

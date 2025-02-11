@@ -2,6 +2,10 @@ const compressbtn=document.querySelector("#compress")
 const compressInput=document.querySelector("#compress-input")
 const splitbtn=document.querySelector("#split")
 const splitInput=document.querySelector("#split-input")
+const submitbtn=document.querySelector("#submit-btn")
+const cancelbtn=document.querySelector("#cancel-btn")
+const frombtn=document.querySelector("#from")
+const tobtn=document.querySelector("#to")
 
 // These keys have to be properly handled before deployment
 const PUBLIC_KEY='project_public_a07c1ecdfedc60c0c2526a6683da46a2_qbUwZ9aefe20d9b8785be481d001c3aa97a10'
@@ -110,13 +114,32 @@ splitbtn.addEventListener("click", ()=>{
 splitInput.addEventListener("change", async(event)=>{
     try{
         showSplit()
+        
+        // Preventing default behaviour of cancel button
+        cancelbtn.addEventListener("click", (event)=>{
+            hideSplit()
+        })
+        
+        const [from, to]=await getFromTo()
         const file=event.target.files[0]
+
+        console.log(from, to)
+
     }catch(err){
         console.log(err)
     }
 })
 
 // Essential functions
+
+async function getFromTo(){
+    return new Promise((resolve, reject)=>{
+        submitbtn.addEventListener("click", (event)=>{
+            resolve(frombtn.value, tobtn.value)
+        })
+    })
+}
+
 async function getToken(){
     const token=sessionStorage.getItem("token")
     if(token){

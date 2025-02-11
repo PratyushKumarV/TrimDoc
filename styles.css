@@ -104,6 +104,14 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
     height:auto;
 }
 
+.split-heading{
+    background-color: #1D2D44;
+    border-radius: 24px;
+    display: inline-block;
+    padding: 10px 24px;
+    box-shadow: 6px 6px #0d1321;
+}
+
 .split-dialog{
     position: fixed;
     top: 0;
@@ -119,8 +127,12 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
 
 input{
     background-color: #F0EBD8;
-    border-radius: 2vw;
+    border-radius: 16px;
     line-height: 4vh;
+    margin-right:16px;
+    box-shadow: 5px 5px #0d1321;
+    font-size: 12px;
+    padding: 4px;
 }
 
 .btn{
@@ -129,6 +141,8 @@ input{
     padding: 1vh 2vw;
     border-radius: 2vh;
     font-family: sugarMagic;
+    font-size: 20px;
+    box-shadow: 4px 4px #0d1321;
 }
 
 .btn-wrapper{
@@ -149,6 +163,11 @@ input{
     font-family: sugarMagic;
     border-radius: 2vw;
     font-size: 20px;
+    box-shadow: 8px 8px #0d1321;
+}
+
+.dialog label{
+    font-size: 24px;
 }
 
 .hidden{
