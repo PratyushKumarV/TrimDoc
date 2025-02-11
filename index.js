@@ -119,7 +119,7 @@ splitInput.addEventListener("change", async(event)=>{
         cancelbtn.addEventListener("click", (event)=>{
             hideSplit()
         })
-        
+        // THIS NEEDS FIXING 🤦‍♂️
         const [from, to]=await getFromTo()
         const file=event.target.files[0]
 
