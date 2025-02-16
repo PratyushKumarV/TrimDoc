@@ -170,7 +170,16 @@ async function getFromTo(){
 async function getToken(){
     const token=sessionStorage.getItem("token")
     if(token){
-        return token
+        const storedTime=sessionStorage.getItem("tokenTimeStamp")
+        if(storedTime){
+            const tokenAge=Date.now()-storedTime
+            if(tokenAge<2*60*60*1000){
+                return token
+            }else{
+                sessionStorage.removeItem("token")
+                sessionStorage.removeItem("tokenTimeStamp")
+            }
+        }
     }
     try{
         const {token:newToken} = await sendRequest("https://api.ilovepdf.com/v1/auth",{
@@ -184,7 +193,10 @@ async function getToken(){
                 }
             )
         })
+        const currentTime=Date.now()
         sessionStorage.setItem("token",newToken)
+        sessionStorage.setItem("tokenTimeStamp", currentTime)
+
         return newToken
     }catch(error){
         throw  new Error(error)
