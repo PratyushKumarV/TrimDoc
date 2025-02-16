@@ -1,3 +1,6 @@
+import {PDFDocument} from "./node_modules/pdf-lib/dist/pdf-lib.esm.js"
+console.log(PDFDocument)
+
 const compressbtn=document.querySelector("#compress")
 const compressInput=document.querySelector("#compress-input")
 const splitbtn=document.querySelector("#split")
