@@ -113,17 +113,41 @@ splitbtn.addEventListener("click", ()=>{
 
 splitInput.addEventListener("change", async(event)=>{
     try{
-        showSplit()
+        // showSplit()
         
-        // Preventing default behaviour of cancel button
-        cancelbtn.addEventListener("click", (event)=>{
-            hideSplit()
-        })
-        // THIS NEEDS FIXING 🤦‍♂️
-        const [from, to]=await getFromTo()
+        // // Preventing default behaviour of cancel button
+        // cancelbtn.addEventListener("click", (event)=>{
+        //     hideSplit()
+        // })
+        // // THIS NEEDS FIXING 🤦‍♂️
+        // const [from, to]=await getFromTo()
         const file=event.target.files[0]
 
-        console.log(from, to)
+        // console.log(from, to)
+
+        const {server: uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/split", {
+            method:"GET",
+            headers:{
+                "Content-type":"application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        })
+        console.log(uploadServer)
+        console.log(taskId)
+        
+        const formDataUpload=new FormData()
+        formDataUpload.append("task", taskId)
+        formDataUpload.append("file", file)
+        const {server_filename}=await sendRequest(`https://${uploadServer}/v1/upload`, {
+            method:"POST",
+            headers:{
+                "Authorization": `Bearer ${token}`
+            },
+            body:formDataUpload
+        })
+        console.log(server_filename)
+
+        
 
     }catch(err){
         console.log(err)
@@ -136,6 +160,9 @@ async function getFromTo(){
     return new Promise((resolve, reject)=>{
         submitbtn.addEventListener("click", (event)=>{
             resolve(frombtn.value, tobtn.value)
+            frombtn.value=''
+            tobtn.value=''
+            hideSplit()
         })
     })
 }
@@ -160,7 +187,7 @@ async function getToken(){
         sessionStorage.setItem("token",newToken)
         return newToken
     }catch(error){
-        console.log(error)
+        throw  new Error(error)
     }
 }
 
@@ -170,7 +197,7 @@ async function sendRequest(url, options){
     const data=await response.json()
     if(!response.ok){
         const errorText=await response.text()
-        console.log(errorText)
+        throw new Error(errorText)
     }
     return data
 }
