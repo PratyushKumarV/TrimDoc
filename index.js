@@ -1,5 +1,4 @@
-import {PDFDocument} from "./node_modules/pdf-lib/dist/pdf-lib.esm.js"
-console.log(PDFDocument)
+import {PDFDocument} from "./libs/pdf-lib.esm.min.js" // getting minified es6 pdf-lib file for calculating number of pages for split functionality
 
 const compressbtn=document.querySelector("#compress")
 const compressInput=document.querySelector("#compress-input")
@@ -7,13 +6,12 @@ const splitbtn=document.querySelector("#split")
 const splitInput=document.querySelector("#split-input")
 const submitbtn=document.querySelector("#submit-btn")
 const cancelbtn=document.querySelector("#cancel-btn")
-const frombtn=document.querySelector("#from")
-const tobtn=document.querySelector("#to")
+const fromEl=document.querySelector("#from")
+const toEl=document.querySelector("#to")
 
 // These keys have to be properly handled before deployment
 const PUBLIC_KEY='project_public_a07c1ecdfedc60c0c2526a6683da46a2_qbUwZ9aefe20d9b8785be481d001c3aa97a10'
 const SECRET_KEY='secret_key_2512854c848aa25009ebf990b3608df8_GXNZu2c38c7bb9742847df64f32491ad72b4c'
-const token=await getToken()
 
 // UI elements toggle
 function showLoader(){
@@ -40,6 +38,7 @@ compressbtn.addEventListener("click", ()=>{
 compressInput.addEventListener("change", async(event)=>{
     try{
         showLoader()
+        const token=await getToken()
         const file=Array.from(event.target.files)
         const downloadableBlob=[]
 
@@ -114,19 +113,38 @@ splitbtn.addEventListener("click", ()=>{
     splitInput.click()
 })
 
+let abortController=new AbortController() // Web API that can be used for aborting asynchronous operations
+
+cancelbtn.addEventListener("click", ()=>{
+    fromEl.value=''
+    toEl.value=''
+    hideSplit()
+    abortController.abort() // creates a signal 
+    abortController=new AbortController()
+})
+
 splitInput.addEventListener("change", async(event)=>{
     try{
-        // showSplit()
-        
-        // // Preventing default behaviour of cancel button
-        // cancelbtn.addEventListener("click", (event)=>{
-        //     hideSplit()
-        // })
-        // // THIS NEEDS FIXING 🤦‍♂️
-        // const [from, to]=await getFromTo()
+        showSplit()
+        const token=await getToken()
         const file=event.target.files[0]
+        const numberOfPages=await getPageNumber(file)
+        console.log(numberOfPages)
+        
+        // THIS NEEDS FIXING 🤦‍♂️
 
-        // console.log(from, to)
+        // promise.race can be used to find if the operation is aborted first or the user has submitted values
+        const [from, to]=await Promise.race([
+            getFromTo(),
+            new Promise((resolve, reject)=>{
+                abortController.signal.addEventListener("abort", ()=>reject("Process Cancelled"))
+            })
+        ])
+
+        console.log(from, to)
+        
+        showLoader()
+        // validateRange(from, to)
 
         const {server: uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/split", {
             method:"GET",
@@ -150,7 +168,40 @@ splitInput.addEventListener("change", async(event)=>{
         })
         console.log(server_filename)
 
+        const processRequestData={
+            task: taskId,
+            tool:"split",
+            files:[
+                {
+                    server_filename:server_filename,
+                    filename:`${file.name.slice(0, file.name.length-4)}.pdf`
+                }
+            ],
+            ranges:`${from}-${to}`
+        }
+
+        const processStatus=await sendRequest(`https://${uploadServer}/v1/process`,{
+            method:"POST",
+            headers:{
+                "Authorization":`Bearer ${token}`,
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(processRequestData)
+        })
+        console.log(processStatus)
+
+        const downloadResponse=await fetch(`https://${uploadServer}/v1/download/${taskId}`, {            
+            method:"GET",
+            headers:{
+                "Authorization": `Bearer ${token}`,
+            }
+        })
         
+        const readableStream=downloadResponse.body
+        
+        const blob=await streamToBlob(readableStream)
+        hideLoader()    
+        downloadFile(blob, processStatus.download_filename)
 
     }catch(err){
         console.log(err)
@@ -159,23 +210,13 @@ splitInput.addEventListener("change", async(event)=>{
 
 // Essential functions
 
-async function getFromTo(){
-    return new Promise((resolve, reject)=>{
-        submitbtn.addEventListener("click", (event)=>{
-            resolve(frombtn.value, tobtn.value)
-            frombtn.value=''
-            tobtn.value=''
-            hideSplit()
-        })
-    })
-}
-
 async function getToken(){
     const token=sessionStorage.getItem("token")
     if(token){
         const storedTime=sessionStorage.getItem("tokenTimeStamp")
         if(storedTime){
             const tokenAge=Date.now()-storedTime
+            console.log(tokenAge)
             if(tokenAge<2*60*60*1000){
                 return token
             }else{
@@ -207,14 +248,14 @@ async function getToken(){
 }
 
 async function sendRequest(url, options){
-    const request=new Request(url, options)
-    const response=await fetch(request)
-    const data=await response.json()
-    if(!response.ok){
-        const errorText=await response.text()
-        throw new Error(errorText)
+    try{
+        const request=new Request(url, options)
+        const response=await fetch(request)
+        const data=await response.json()
+        return data
+    }catch(error){
+        throw new Error(error)
     }
-    return data
 }
 
 async function streamToBlob(readableStream){ // Converts a readable stream into a blob for downloading
@@ -234,10 +275,49 @@ async function streamToBlob(readableStream){ // Converts a readable stream into 
     return new Blob(chunks, {type: "application/pdf"})
 }
 
-async function downloadFile(blob, filename){
+function downloadFile(blob, filename){
     const link=document.createElement('a') 
     const downloadURL=URL.createObjectURL(blob)
     link.href=downloadURL
     link.download=filename
     link.click()
+}
+
+async function getFromTo(){
+    return new Promise((resolve, reject)=>{
+        submitbtn.addEventListener("click", function handler(){
+            resolve([fromEl.value, toEl.value])
+            submitbtn.removeEventListener("click", handler)
+            fromEl.value=""
+            toEl.value=""
+            hideSplit()
+        })
+    })
+}
+
+function pageNumberPromise(file){
+    return new Promise((resolve, reject)=>{
+        const reader=new FileReader()
+
+        reader.onload=()=>resolve(reader.result) // when these are encountered they are pushed to the web api
+        reader.onerror=(error)=>reject(error) // same as onload. These functions get executed when the file reading is finished.
+
+        reader.readAsArrayBuffer(file) // readAsArrayBuffer is an asyncrhonous operation
+    })
+}
+
+async function getPageNumber(file){
+    try{
+        const arrayBuffer=await pageNumberPromise(file)
+        const pdf=await PDFDocument.load(arrayBuffer)
+        return pdf.getPageCount()
+    }
+    catch(error){
+        throw new Error(error)
+    }
+}
+
+// function to validate the range of the files given by the user
+function validateRange(from, to){
+
 }
