@@ -6,6 +6,8 @@
 body{
     margin:0px;
     background-color: #F0EBD8;
+    min-height: 200px;
+    min-width: 200px;
 }
 
 .hero-wrapper{
@@ -51,7 +53,7 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
 }
 #compress{
     font-family: sugarMagic;
-    height: clamp(4vh, 6vh, 12vh);
+    min-height: clamp(4vh, 6vh, 12vh);
     background-color: #1D2D44;
     width: clamp(10vw, 12vw, 14vw);
     color: #F1F1F1;
@@ -67,11 +69,10 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
     color: #1D2D44;
     cursor:grab
 }
-#split{
-    height: 6vh;
+#split{ 
     font-size: 2vw;
     background-color: #3E5C76;
-    height: clamp(4vh, 6vh, 12vh);
+    min-height: clamp(4vh, 6vh, 12vh);
     width: clamp(10vw, 12vw, 14vw);
     color: #F1F1F1;
     font-family: sugarMagic;
@@ -129,10 +130,12 @@ input{
     background-color: #F0EBD8;
     border-radius: 16px;
     line-height: 4vh;
+    width:150px;
     margin-right:16px;
     box-shadow: 5px 5px #0d1321;
     font-size: 12px;
     padding: 4px;
+    font-size: 20px;
 }
 
 .btn{

@@ -9,10 +9,6 @@ const cancelbtn=document.querySelector("#cancel-btn")
 const fromEl=document.querySelector("#from")
 const toEl=document.querySelector("#to")
 
-// These keys have to be properly handled before deployment
-const PUBLIC_KEY='project_public_a07c1ecdfedc60c0c2526a6683da46a2_qbUwZ9aefe20d9b8785be481d001c3aa97a10'
-const SECRET_KEY='secret_key_2512854c848aa25009ebf990b3608df8_GXNZu2c38c7bb9742847df64f32491ad72b4c'
-
 // UI elements toggle
 function showLoader(){
     document.querySelector(".loader").classList.remove("hidden") // removes the hidden class in the selected element
@@ -119,7 +115,7 @@ cancelbtn.addEventListener("click", ()=>{
     fromEl.value=''
     toEl.value=''
     hideSplit()
-    abortController.abort() // creates a signal 
+    abortController.abort() // creates a signal
     abortController=new AbortController()
 })
 
@@ -130,10 +126,8 @@ splitInput.addEventListener("change", async(event)=>{
         const file=event.target.files[0]
         const numberOfPages=await getPageNumber(file)
         console.log(numberOfPages)
-        
-        // THIS NEEDS FIXING 🤦‍♂️
 
-        // promise.race can be used to find if the operation is aborted first or the user has submitted values
+        // promise.race can be used to find if the operation is aborted first or if the user has submitted values
         const [from, to]=await Promise.race([
             getFromTo(),
             new Promise((resolve, reject)=>{
@@ -202,6 +196,7 @@ splitInput.addEventListener("change", async(event)=>{
         const blob=await streamToBlob(readableStream)
         hideLoader()    
         downloadFile(blob, processStatus.download_filename)
+        console.log(`Downloaded file ${processStatus.download_filename}`)
 
     }catch(err){
         console.log(err)
@@ -216,7 +211,6 @@ async function getToken(){
         const storedTime=sessionStorage.getItem("tokenTimeStamp")
         if(storedTime){
             const tokenAge=Date.now()-storedTime
-            console.log(tokenAge)
             if(tokenAge<2*60*60*1000){
                 return token
             }else{
@@ -226,16 +220,11 @@ async function getToken(){
         }
     }
     try{
-        const {token:newToken} = await sendRequest("https://api.ilovepdf.com/v1/auth",{
-            method:"POST",
+        const {token: newToken} = await sendRequest(`http://localhost:5000/api/data`, {
+            method:"GET",
             headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(
-                {
-                    public_key:PUBLIC_KEY
-                }
-            )
+                "Content-type": "application/json"
+            }
         })
         const currentTime=Date.now()
         sessionStorage.setItem("token",newToken)
