@@ -33,9 +33,13 @@ compressbtn.addEventListener("click", ()=>{
 //compress functionality
 compressInput.addEventListener("change", async(event)=>{
     try{
+        const file=Array.from(event.target.files)
+        if(file.length==0){
+            return
+        }
+        compressInput.value="" // resetting because if it is not done then it is not possible to select the same file for the same operation contiguously
         showLoader()
         const token=await getToken()
-        const file=Array.from(event.target.files)
         const downloadableBlob=[]
 
         // The map function is applied to an array and it accepts a callback whose argument is each element in the array
@@ -121,24 +125,32 @@ cancelbtn.addEventListener("click", ()=>{
 
 splitInput.addEventListener("change", async(event)=>{
     try{
+        const file=event.target.files[0]
+        if(file==undefined){
+            return
+        }
+        splitInput.value=""
         showSplit()
         const token=await getToken()
-        const file=event.target.files[0]
         const numberOfPages=await getPageNumber(file)
-        console.log(numberOfPages)
-
         // promise.race can be used to find if the operation is aborted first or if the user has submitted values
         const [from, to]=await Promise.race([
             getFromTo(),
             new Promise((resolve, reject)=>{
-                abortController.signal.addEventListener("abort", ()=>reject("Process Cancelled"))
+                abortController.signal.addEventListener("abort", ()=>{
+                    reject("Process Cancelled")
+                })
             })
         ])
-
-        console.log(from, to)
         
+        validateRange(from, to, numberOfPages)
+        if(abortController.signal.aborted){
+            window.alert("Invalid range")
+            abortController=new AbortController() // reset the abort controller
+            return
+        }
+
         showLoader()
-        // validateRange(from, to)
 
         const {server: uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/split", {
             method:"GET",
@@ -147,8 +159,6 @@ splitInput.addEventListener("change", async(event)=>{
                 "Authorization": `Bearer ${token}`
             }
         })
-        console.log(uploadServer)
-        console.log(taskId)
         
         const formDataUpload=new FormData()
         formDataUpload.append("task", taskId)
@@ -160,7 +170,6 @@ splitInput.addEventListener("change", async(event)=>{
             },
             body:formDataUpload
         })
-        console.log(server_filename)
 
         const processRequestData={
             task: taskId,
@@ -177,12 +186,11 @@ splitInput.addEventListener("change", async(event)=>{
         const processStatus=await sendRequest(`https://${uploadServer}/v1/process`,{
             method:"POST",
             headers:{
-                "Authorization":`Bearer ${token}`,
+                "Authorization":`Bearer ${token}`,  
                 "Content-Type":"application/json"
             },
             body:JSON.stringify(processRequestData)
         })
-        console.log(processStatus)
 
         const downloadResponse=await fetch(`https://${uploadServer}/v1/download/${taskId}`, {            
             method:"GET",
@@ -211,7 +219,7 @@ async function getToken(){
         const storedTime=sessionStorage.getItem("tokenTimeStamp")
         if(storedTime){
             const tokenAge=Date.now()-storedTime
-            if(tokenAge<2*60*60*1000){
+            if(tokenAge<1*60*60*1000){ // If token age is less than one hour it is returned
                 return token
             }else{
                 sessionStorage.removeItem("token")
@@ -291,7 +299,7 @@ function pageNumberPromise(file){
         reader.onload=()=>resolve(reader.result) // when these are encountered they are pushed to the web api
         reader.onerror=(error)=>reject(error) // same as onload. These functions get executed when the file reading is finished.
 
-        reader.readAsArrayBuffer(file) // readAsArrayBuffer is an asyncrhonous operation
+        reader.readAsArrayBuffer(file) // readAsArrayBuffer is an asyncrhonous operation. This is the reason why this is given after the above two web API functions
     })
 }
 
@@ -307,6 +315,8 @@ async function getPageNumber(file){
 }
 
 // function to validate the range of the files given by the user
-function validateRange(from, to){
-
+function validateRange(from, to, numberOfPages){
+    if((from<0 || to<0) || (to<from) || (to>numberOfPages || from>=numberOfPages)){
+        abortController.abort()
+    }
 }

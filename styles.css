@@ -7,14 +7,13 @@ body{
     margin:0px;
     background-color: #F0EBD8;
     min-height: 200px;
-    min-width: 200px;
+    min-width: 400px;
 }
 
 .hero-wrapper{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 20vh;
 }
 
 .hero{
@@ -49,7 +48,7 @@ input[type="file"]{ /*Hiding the input tag and then triggering the input when th
 .button-wrapper{
     display: flex;
     justify-content: center;
-    margin-top: 4vh;
+    margin-top: 5vh;
 }
 #compress{
     font-family: sugarMagic;
@@ -133,7 +132,6 @@ input{
     width:150px;
     margin-right:16px;
     box-shadow: 5px 5px #0d1321;
-    font-size: 12px;
     padding: 4px;
     font-size: 20px;
 }
@@ -176,3 +174,74 @@ input{
 .hidden{
     display:none
 }
+
+/* Media queries for chrome extension */
+
+@media screen and (max-width:400px){
+    #wrapper{
+        display: flex;
+        height:80vh;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .hero{
+        width: 100vw;
+        height: 2vh;
+        font-size: 40px;
+    }
+    .trim{
+        width:24vw;
+        height:24vh;
+        font-size: 40px;
+        box-shadow: 3px 5px #0d1321;
+    }
+    .doc{
+        width:24vw;
+        height:24vh;
+        box-shadow: 3px 5px #0d1321;
+    }
+    .button-wrapper{
+        margin-top: 30vh;
+    }
+    #compress{
+        width:30vw;
+        height:20vh;
+        font-size: 20px;
+        box-shadow: 2px 3px #0d1321;
+        margin-right: 20px;
+    }
+    #split{
+        width:30vw;
+        height:20vh;
+        font-size: 20px;
+        box-shadow: 2px 3px #0d1321;
+    }
+    .split-heading{
+        padding:5px 12px;
+        font-size: 24px;
+        margin:8px 0px 16px;
+        box-shadow: 4px 4px #0d1321;
+    }
+    .dialog{
+        box-shadow: 4px 4px #0d1321;
+    }
+    .dialog label{
+        font-size: 20px;
+    }
+    input{
+        margin-right: 5px;
+        width:50px;
+        height: 12px;
+        box-shadow: 4px 4px #0d1321;
+        font-size: 10px;
+    }
+    .btn{
+        font-size: 16px;
+        box-shadow: 2.5px 2.5px #0d1321;
+        border-radius: 25px;
+    }
+    .btn-wrapper{
+        margin-top: 16px;
+    }
+}   
