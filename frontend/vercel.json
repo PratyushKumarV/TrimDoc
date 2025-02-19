@@ -12,6 +12,14 @@
         {
             "src":"./index.js",
             "use":"@vercel/static"
+        },
+        {
+            "src":"./fonts/sugarmagicpersonaluseonly-jemyo.otf",
+            "use":"@vercel/static"
+        },
+        {
+            "src":"./images/Loop%20Waiting%20GIF%20by%20BenneBockshecker.gif",
+            "use":"@vercel/static"
         }
     ],
     "routes":[
