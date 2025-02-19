@@ -146,6 +146,7 @@ splitInput.addEventListener("change", async(event)=>{
         validateRange(from, to, numberOfPages)
         if(abortController.signal.aborted){
             window.alert("Invalid range")
+            console.log("Process cancelled")
             abortController=new AbortController() // reset the abort controller
             return
         }
