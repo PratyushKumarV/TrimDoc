@@ -229,7 +229,7 @@ async function getToken(){
         }
     }
     try{
-        const {token: newToken} = await sendRequest(`https://trim-doc-backend.vercel.app/`, {
+        const {token: newToken} = await sendRequest(`https://trim-doc-backend.vercel.app/api/data`, {
             method:"GET",
             headers:{
                 "Content-type": "application/json"
