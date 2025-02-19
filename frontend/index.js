@@ -142,7 +142,7 @@ splitInput.addEventListener("change", async(event)=>{
                 })
             })
         ])
-        
+
         validateRange(from, to, numberOfPages)
         if(abortController.signal.aborted){
             window.alert("Invalid range")
@@ -284,7 +284,7 @@ function downloadFile(blob, filename){
 async function getFromTo(){
     return new Promise((resolve, reject)=>{
         submitbtn.addEventListener("click", function handler(){
-            resolve([fromEl.value, toEl.value])
+            resolve([parseInt(fromEl.value), parseInt(toEl.value)])
             submitbtn.removeEventListener("click", handler)
             fromEl.value=""
             toEl.value=""
