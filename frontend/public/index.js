@@ -1,4 +1,4 @@
-import {PDFDocument} from "../libs/pdf-lib.esm.min.js" // getting minified es6 pdf-lib file for calculating number of pages for split functionality
+import {PDFDocument} from "./libs/pdf-lib.esm.min.js" // getting minified es6 pdf-lib file for calculating number of pages for split functionality
 
 const compressbtn=document.querySelector("#compress")
 const compressInput=document.querySelector("#compress-input")
