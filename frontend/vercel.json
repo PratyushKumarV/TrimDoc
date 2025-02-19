@@ -24,6 +24,10 @@
         {
             "src":"./libs/pdf-lib.esm.min.js",
             "use":"@vercel/static"
+        },
+        {
+            "src":"./manifest.json",
+            "use":"@vercel/static"
         }
     ],
     "routes":[
