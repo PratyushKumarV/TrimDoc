@@ -18,7 +18,11 @@
             "use":"@vercel/static"
         },
         {
-            "src":"./images/Loop%20Waiting%20GIF%20by%20BenneBockshecker.gif",
+            "src":"./images/Loop_Waiting.gif",
+            "use":"@vercel/static"
+        },
+        {
+            "src":"./libs/pdf-lib.esm.min.js",
             "use":"@vercel/static"
         }
     ],
