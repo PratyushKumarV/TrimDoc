@@ -9,6 +9,9 @@ const cancelbtn=document.querySelector("#cancel-btn")
 const fromEl=document.querySelector("#from")
 const toEl=document.querySelector("#to")
 
+let token=null
+let cachedToken=null
+
 // UI elements toggle
 function showLoader(){
     document.querySelector(".loader").classList.remove("hidden") // removes the hidden class in the selected element
@@ -26,12 +29,50 @@ function hideSplit(){
     document.querySelector(".split-dialog").classList.add("hidden")
 }
 
+// Button event listeners
 compressbtn.addEventListener("click", ()=>{
-    compressInput.click() //simulates a button click for the input element when the compress button is clicked
+    compressInput.click() 
 })
 
-//compress functionality
 compressInput.addEventListener("change", async(event)=>{
+    try{
+        await getValidToken()
+        compress(event, token)
+    }catch(error){
+        console.log(error)
+    }
+})
+
+splitbtn.addEventListener("click", ()=>{
+    splitInput.click()
+})
+
+let abortController=new AbortController() // Web API that can be used for aborting asynchronous operations
+
+//cancel button for split
+cancelbtn.addEventListener("click", ()=>{
+    fromEl.value=''
+    toEl.value=''
+    hideSplit()
+    abortController.abort() // creates a signal
+    abortController=new AbortController()
+})
+
+splitInput.addEventListener("change", async(event)=>{
+    try{
+        await getValidToken()
+        split(event, token)
+    }catch(error){
+        console.log(error)
+    }
+})
+
+
+
+// Essential functions
+
+//compress functionality
+async function compress(event, token){
     try{
         const file=Array.from(event.target.files)
         if(file.length==0){
@@ -39,7 +80,6 @@ compressInput.addEventListener("change", async(event)=>{
         }
         compressInput.value="" // resetting because if it is not done then it is not possible to select the same file for the same operation contiguously
         showLoader()
-        const token=await getToken()
         const downloadableBlob=[]
 
         // The map function is applied to an array and it accepts a callback whose argument is each element in the array
@@ -106,32 +146,17 @@ compressInput.addEventListener("change", async(event)=>{
     }catch(err){
         console.log(err)
     }
-})
+}
 
 // split functionality
-splitbtn.addEventListener("click", ()=>{
-    splitInput.click()
-})
-
-let abortController=new AbortController() // Web API that can be used for aborting asynchronous operations
-
-cancelbtn.addEventListener("click", ()=>{
-    fromEl.value=''
-    toEl.value=''
-    hideSplit()
-    abortController.abort() // creates a signal
-    abortController=new AbortController()
-})
-
-splitInput.addEventListener("change", async(event)=>{
+async function split(event, token){
     try{
         const file=event.target.files[0]
-        if(file==undefined){
+        if(!file){
             return
         }
         splitInput.value=""
         showSplit()
-        const token=await getToken()
         const numberOfPages=await getPageNumber(file)
         // promise.race can be used to find if the operation is aborted first or if the user has submitted values
         const [from, to]=await Promise.race([
@@ -210,41 +235,56 @@ splitInput.addEventListener("change", async(event)=>{
     }catch(err){
         console.log(err)
     }
-})
+}
 
-// Essential functions
-
+// Token handling
 async function getToken(){
-    const token=sessionStorage.getItem("token")
-    if(token){
-        const storedTime=sessionStorage.getItem("tokenTimeStamp")
-        if(storedTime){
-            const tokenAge=Date.now()-storedTime
-            if(tokenAge<1*60*60*1000){ // If token age is less than one hour it is returned
-                return token
-            }else{
-                sessionStorage.removeItem("token")
-                sessionStorage.removeItem("tokenTimeStamp")
-            }
-        }
-    }
     try{
-        const {token: newToken} = await sendRequest(`https://trim-doc-backend.vercel.app/api/data`, {
-            method:"GET",
-            headers:{
-                "Content-type": "application/json"
-            }
-        })
-        const currentTime=Date.now()
-        sessionStorage.setItem("token",newToken)
-        sessionStorage.setItem("tokenTimeStamp", currentTime)
 
-        return newToken
+        if(cachedToken){
+            return cachedToken
+        }
+
+        // setting token as a cookie
+        await fetch("http://localhost:5000/api/get-cookie", {
+            method:"GET",
+            credentials:"include" // ensures cookies are recieved on the browser
+        })
+
+        let response=await fetch("http://localhost:5000/api/protected-route", {
+            method:"GET",
+            credentials: "include" // includes cookie in the request
+        })
+
+        if(response.status===401){ // cookie expired
+            console.log("Refreshing token")
+            await fetch("http://localhost:5000/api/get-cookie", {
+                method: "GET",
+                credentials:"include"
+            })
+            response=await fetch("http://localhost:5000/api/protected-route",{
+                method:"GET",
+                credentials:"include"
+            })
+        }
+
+        const tokenJSON=await response.json()
+        cachedToken=tokenJSON.token
+        return cachedToken
+
     }catch(error){
         throw  new Error(error)
     }
 }
 
+async function getValidToken(){
+    if(!token){
+        token=await getToken()
+    }
+    return token
+}
+
+//request handling
 async function sendRequest(url, options){
     try{
         const request=new Request(url, options)
@@ -256,6 +296,7 @@ async function sendRequest(url, options){
     }
 }
 
+// conversion of stream to blob
 async function streamToBlob(readableStream){ // Converts a readable stream into a blob for downloading
     const reader=readableStream.getReader()
     const chunks=[]
@@ -273,12 +314,14 @@ async function streamToBlob(readableStream){ // Converts a readable stream into 
     return new Blob(chunks, {type: "application/pdf"})
 }
 
+// download blob
 function downloadFile(blob, filename){
     const link=document.createElement('a') 
     const downloadURL=URL.createObjectURL(blob)
     link.href=downloadURL
     link.download=filename
     link.click()
+    URL.revokeObjectURL(downloadURL)
 }
 
 async function getFromTo(){

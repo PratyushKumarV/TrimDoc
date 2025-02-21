@@ -45,7 +45,7 @@ body{
 input[type="file"]{ /*Hiding the input tag and then triggering the input when the button is clicked using js*/
     display: none;
 }
-.button-wrapper{
+.button-wrapper-parent{
     display: flex;
     justify-content: center;
     margin-top: 5vh;
@@ -201,7 +201,7 @@ input{
         height:24vh;
         box-shadow: 3px 5px #0d1321;
     }
-    .button-wrapper{
+    .button-wrapper-parent{
         margin-top: 30vh;
     }
     #compress{
