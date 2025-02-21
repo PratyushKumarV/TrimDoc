@@ -246,23 +246,23 @@ async function getToken(){
         }
 
         // setting token as a cookie
-        await fetch("http://localhost:5000/api/get-cookie", {
+        await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", {
             method:"GET",
             credentials:"include" // ensures cookies are recieved on the browser
         })
 
-        let response=await fetch("http://localhost:5000/api/protected-route", {
+        let response=await fetch("https://trim-doc-backend.vercel.app/api/protected-route", {
             method:"GET",
             credentials: "include" // includes cookie in the request
         })
 
         if(response.status===401){ // cookie expired
             console.log("Refreshing token")
-            await fetch("http://localhost:5000/api/get-cookie", {
+            await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", {
                 method: "GET",
                 credentials:"include"
             })
-            response=await fetch("http://localhost:5000/api/protected-route",{
+            response=await fetch("https://trim-doc-backend.vercel.app/api/protected-route",{
                 method:"GET",
                 credentials:"include"
             })
