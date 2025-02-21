@@ -11,7 +11,7 @@ const PORT=5000
 app.use(cookieParser())
 
 app.use(cors({
-    origin: "https://trim-doc-frontend.vercel.app",
+    origin: ["https://trim-doc-frontend.vercel.app", "https://trim-doc-frontend-pratyushkumarvs-projects.vercel.app/"],
     credentials: true // allows cookies to be sent in the request
 })) // Allows frontend requests. the frontend is hosted on a different server
 app.use(express.json()) // parses incoming json from the frontend which is handled using the req parameter
