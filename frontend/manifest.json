@@ -2,6 +2,11 @@
     "manifest_version":3,
     "version": "1.0",
     "name": "TrimDoc",
+    "description":"A PDF manipulation chrome extension",
+    "permissions": [
+        "cookies",
+        "storage"
+    ],
     "action": {
         "default_popup":"index.html",
         // "default_icon":"images/48.png",

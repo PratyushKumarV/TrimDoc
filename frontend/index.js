@@ -169,7 +169,6 @@ async function split(event, token){
         ])
 
         validateRange(from, to, numberOfPages)
-        console.log(from<0 || to<0) || (to<from) || (to>numberOfPages || from>=numberOfPages)
         if(abortController.signal.aborted){
             window.alert("Invalid range")
             console.log("Process cancelled")

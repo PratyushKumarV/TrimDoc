@@ -12,7 +12,7 @@ app.use(cookieParser())
 
 app.use(cors({
     origin: [
-        "https://trim-doc-frontend.vercel.app", "https://trim-doc-frontend-pratyushkumarvs-projects.vercel.app", "http://127.0.0.1:5500"
+        "https://trim-doc-frontend.vercel.app", "https://trim-doc-frontend-pratyushkumarvs-projects.vercel.app", "http://127.0.0.1:5500","chrome-extension://jgglhcjgfbejdgpdacioocpjfplmkgbc"
     ],    
     credentials: true // allows cookies to be sent in the request
 })) // Allows frontend requests. the frontend is hosted on a different server
