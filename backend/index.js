@@ -33,7 +33,7 @@ app.get("/api/get-cookie", async (req, res)=>{
             secure : true, 
             sameSite:"None" 
         })
-        res.json({message: "Cookie set successfully"})
+        res.json({message: "Cookie set successfully", token:token})
     }catch(err){
         res.status(500).json({error: "Error fetching JWT"})
     }
