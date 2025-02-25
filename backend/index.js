@@ -35,18 +35,10 @@ app.post("/api/get-cookie", async (req, res)=>{
             secure : true, 
             sameSite:"None" 
         })
-        res.json({message: "Cookie set successfully"})
+        res.json({message: "Cookie set successfully", token:token, expiry:Date.now()+1*60*60*1000})
     }catch(err){
         res.status(500).json({error: "Error fetching JWT"})
     }
-})
-
-app.get("/api/protected-route", (req, res)=>{
-    const token=req.cookies.api_token
-    if(!token){ // expiration age for the cookie is set as one hour so if the cookie expires then this becomes true and if the response status is 401 the frontend refreshed the token and cookie.
-        return res.status(401).json({error: "No token found"})
-    }
-    res.json({token})
 })
 
 app.listen(PORT, ()=>{

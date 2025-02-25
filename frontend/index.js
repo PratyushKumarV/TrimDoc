@@ -9,8 +9,8 @@ const cancelbtn=document.querySelector("#cancel-btn")
 const fromEl=document.querySelector("#from")
 const toEl=document.querySelector("#to")
 
-let token=null
 let cachedToken=null
+let expiry=null
 
 // UI elements toggle
 function showLoader(){
@@ -36,7 +36,7 @@ compressbtn.addEventListener("click", ()=>{
 
 compressInput.addEventListener("change", async(event)=>{
     try{
-        await getValidToken()
+        const token=await getToken()
         compress(event, token)
     }catch(error){
         console.log(error)
@@ -60,7 +60,7 @@ cancelbtn.addEventListener("click", ()=>{
 
 splitInput.addEventListener("change", async(event)=>{
     try{
-        await getValidToken()
+        const token=await getToken()
         split(event, token)
     }catch(error){
         console.log(error)
@@ -241,47 +241,24 @@ async function split(event, token){
 async function getToken(){
     try{
 
-        if(cachedToken){
+        if(cachedToken && Date.now()<expiry){
             return cachedToken
         }
 
         // setting token as a cookie
-        await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", {
+        const res=await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", { 
             method:"POST",
             credentials:"include" // ensures cookies are recieved on the browser
         })
-
-        let response=await fetch("https://trim-doc-backend.vercel.app/api/protected-route", {
-            method:"GET",
-            credentials: "include" // includes cookie in the request
-        })
-
-        if(response.status===401){ // cookie expired
-            console.log("Refreshing token")
-            await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", {
-                method: "POST",
-                credentials:"include"
-            })
-            response=await fetch("https://trim-doc-backend.vercel.app/api/protected-route",{
-                method:"GET",
-                credentials:"include"
-            })
-        }
-
-        const tokenJSON=await response.json()
-        cachedToken=tokenJSON.token
+        const data=await res.json()
+        expiry=data.expiry
+        
+        cachedToken=data.token
         return cachedToken
 
     }catch(error){
         throw  new Error(error)
     }
-}
-
-async function getValidToken(){
-    if(!token){
-        token=await getToken()
-    }
-    return token
 }
 
 //request handling
