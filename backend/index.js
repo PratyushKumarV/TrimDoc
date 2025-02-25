@@ -12,12 +12,6 @@ app.use(cookieParser())
 
 app.set("trust proxy", 1)
 
-app.use((req, res, next)=>{
-    res.header("Access-Control-Allow-Origin", "https://trim-doc-frontend.vercel.app")
-    res.header("Access-Control-Allow-Credentials", "true")
-    next()
-})
-
 app.use(cors({
     origin: [
         "https://trim-doc-frontend.vercel.app", "https://trim-doc-frontend-pratyushkumarvs-projects.vercel.app", "http://127.0.0.1:5500","chrome-extension://jgglhcjgfbejdgpdacioocpjfplmkgbc"
@@ -26,7 +20,7 @@ app.use(cors({
 })) // Allows frontend requests. the frontend is hosted on a different server
 app.use(express.json()) // parses incoming json from the frontend which is handled using the req parameter
 
-app.get("/api/get-cookie", async (req, res)=>{
+app.post("/api/get-cookie", async (req, res)=>{
     try{
         const response=await axios.post(`https://api.ilovepdf.com/v1/auth`, {
             headers:{

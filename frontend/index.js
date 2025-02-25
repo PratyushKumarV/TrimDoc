@@ -247,7 +247,7 @@ async function getToken(){
 
         // setting token as a cookie
         await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", {
-            method:"GET",
+            method:"POST",
             credentials:"include" // ensures cookies are recieved on the browser
         })
 
@@ -259,7 +259,7 @@ async function getToken(){
         if(response.status===401){ // cookie expired
             console.log("Refreshing token")
             await fetch("https://trim-doc-backend.vercel.app/api/get-cookie", {
-                method: "GET",
+                method: "POST",
                 credentials:"include"
             })
             response=await fetch("https://trim-doc-backend.vercel.app/api/protected-route",{
