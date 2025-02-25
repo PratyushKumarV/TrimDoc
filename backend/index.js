@@ -10,6 +10,14 @@ const PORT=5000
 
 app.use(cookieParser())
 
+app.set("trust proxy", 1)
+
+app.use((req, res, next)=>{
+    res.header("Access-Control-Allow-Origin", "https://trim-doc-frontend.vercel.app")
+    res.header("Access-Control-Allow-Credentials", "true")
+    next()
+})
+
 app.use(cors({
     origin: [
         "https://trim-doc-frontend.vercel.app", "https://trim-doc-frontend-pratyushkumarvs-projects.vercel.app", "http://127.0.0.1:5500","chrome-extension://jgglhcjgfbejdgpdacioocpjfplmkgbc"
