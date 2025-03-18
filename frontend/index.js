@@ -36,6 +36,7 @@ compressbtn.addEventListener("click", ()=>{
 
 compressInput.addEventListener("change", async(event)=>{
     try{
+        showLoader()
         const token=await getToken()
         compress(event, token)
     }catch(error){
@@ -60,6 +61,7 @@ cancelbtn.addEventListener("click", ()=>{
 
 splitInput.addEventListener("change", async(event)=>{
     try{
+        showLoader()
         const token=await getToken()
         split(event, token)
     }catch(error){
@@ -79,7 +81,6 @@ async function compress(event, token){
             return
         }
         compressInput.value="" // resetting because if it is not done then it is not possible to select the same file for the same operation contiguously
-        showLoader()
         const downloadableBlob=[]
 
         // The map function is applied to an array and it accepts a callback whose argument is each element in the array
