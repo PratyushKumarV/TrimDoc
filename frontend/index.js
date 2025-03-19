@@ -61,9 +61,7 @@ cancelbtn.addEventListener("click", ()=>{
 
 splitInput.addEventListener("change", async(event)=>{
     try{
-        showLoader()
-        const token=await getToken()
-        split(event, token)
+        split(event)
     }catch(error){
         console.log(error)
     }
@@ -150,7 +148,7 @@ async function compress(event, token){
 }
 
 // split functionality
-async function split(event, token){
+async function split(event){
     try{
         const file=event.target.files[0]
         if(!file){
@@ -178,6 +176,7 @@ async function split(event, token){
         }
 
         showLoader()
+        const token=await getToken()
 
         const {server: uploadServer, task:taskId}=await sendRequest("https://api.ilovepdf.com/v1/start/split", {
             method:"GET",
