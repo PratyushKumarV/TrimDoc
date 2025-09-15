@@ -1,24 +1,41 @@
-# TrimDoc
-A PDF manipulation chrome extension that simplfies compressing and splitting PDF's
-## Tech Stack
-* **Frontend:**
-  * VanillaJS
-* **Backend:**
-  * NodeJS
-  * ExpressJS
-## Installation
-Make sure that you have npm installed locally.<br/><br/>
-Clone the repository using the following command:<br/>
-```PowerShell
+# TrimDoc  
+
+A lightweight PDF manipulation Chrome extension that simplifies compressing and splitting PDFs.
+
+---
+
+## ✨ Features  
+- **Compress PDFs** directly in your browser.  
+- **Split PDFs** into multiple files without leaving Chrome.  
+
+---
+
+## 🛠️ Tech Stack  
+
+- **Frontend:** VanillaJS  
+- **Backend:** Node.js + Express  
+
+---
+
+## 📦 Prerequisites  
+
+- [Node.js](https://nodejs.org/) **vXX+** (npm included) installed locally.  
+  > npm ships with Node.js, so installing Node.js gives you npm automatically.
+
+---
+
+## 🚀 Installation  
+
+Clone the repository:
+
+```bash
 git clone https://github.com/PratyushKumarV/TrimDoc.git
 ```
-Once installed move into the backend folder and install the necessary dependencies<br />
-```PowerShell
-npm install
-```
-To use it as a chrome extension, follow the below steps:
-* Go to `chrome://extensions`.
-* Enable Developer Mode.
-* Click on Load Unpacked and select the project folder. You should be able to see the extension in your extensions dashboard. Enable the extension.
-<br/>
-Feel free to play around and use it!
+
+🧩 Load the Extension in Chrome (Developer Mode)
+
+- Open Google Chrome and navigate to chrome://extensions.
+- Enable Developer Mode (toggle in the top-right corner).
+- Click Load Unpacked.
+- Select the project folder you just cloned (the root of the repository).
+- The extension should now appear in your extensions dashboard — enable it to start using TrimDoc.
