@@ -1,6 +1,6 @@
 # TrimDoc  
 
-A lightweight PDF manipulation Chrome extension that simplifies compressing and splitting PDFs.
+A PDF manipulation Chrome extension that simplifies compressing and splitting PDFs.
 
 ---
 
