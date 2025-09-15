@@ -39,11 +39,18 @@ git clone https://github.com/PratyushKumarV/TrimDoc.git
 - Click Load Unpacked.
 - Select the project folder you just cloned (the root of the repository).
 - The extension should now appear in your extensions dashboard — enable it to start using TrimDoc.
-  
+    
+---
+
 ## 📝 External API
 
 This extension uses the [ILovePDF API](https://developer.ilovepdf.com/docs) for PDF manipulation (compressing and splitting PDFs).  
 You’ll need to sign up for an API key to use the backend locally. See their documentation for more details.
 > Note: The backend already has an API key configured. You don’t need to set up your own to use the hosted version.
 
+---
+
+## 🌐 Live Demo
+
+You can try TrimDoc here: [https://trim-doc-frontend.vercel.app](https://trim-doc-frontend.vercel.app)
 
