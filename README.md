@@ -19,7 +19,7 @@ A lightweight PDF manipulation Chrome extension that simplifies compressing and 
 
 ## 📦 Prerequisites  
 
-- [Node.js](https://nodejs.org/) **vXX+** (npm included) installed locally.  
+- [Node.js](https://nodejs.org/) **v22+** (npm included) installed locally.  
   > npm ships with Node.js, so installing Node.js gives you npm automatically.
 
 ---
